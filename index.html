@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#6366F1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TaskMaster">
-    <title>TaskMaster Pro - Ultimate Task Manager</title>
+    <meta name="apple-mobile-web-app-title" content="TaskMaster Pro">
+    <title>TaskMaster Pro Max - Ultimate Task Manager</title>
     <style>
         * {
             margin: 0;
@@ -19,6 +19,7 @@
         :root {
             --primary: #6366F1;
             --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
             --secondary: #F59E0B;
             --success: #10B981;
             --danger: #EF4444;
@@ -27,6 +28,9 @@
             --text-light: #1F2937;
             --text-muted-light: #6B7280;
             --border-light: #E5E7EB;
+            /* Safe area insets */
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
         }
 
         body.dark {
@@ -40,62 +44,62 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg-light);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body.rtl {
-            direction: rtl;
-        }
+        /* RTL Support */
+        body.rtl { direction: rtl; }
+        body.ltr { direction: ltr; }
 
-        body.ltr {
-            direction: ltr;
-        }
-
+        /* App Container - يتكيف مع جميع الشاشات */
         .app {
             max-width: 500px;
             margin: 0 auto;
             background: var(--bg-light);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             position: relative;
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
         }
 
+        /* Screens */
         .screen {
             display: none;
-            padding: 20px;
-            padding-bottom: 80px;
-            animation: fadeIn 0.3s ease;
+            padding: calc(20px + var(--safe-top)) 20px 80px 20px;
+            animation: fadeIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
-        .screen.active {
-            display: block;
-        }
+        .screen.active { display: block; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .greeting {
-            font-size: 24px;
+            font-size: clamp(22px, 6vw, 28px);
             font-weight: 700;
-            color: var(--text-light);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .date {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted-light);
             margin-top: 4px;
         }
 
-        .theme-toggle, .icon-btn {
+        .theme-toggle {
             background: var(--surface-light);
             border: 1px solid var(--border-light);
             width: 44px;
@@ -107,105 +111,130 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
 
+        /* Stats Cards - متجاوبة */
         .stats-row {
             display: flex;
             gap: 12px;
             margin-bottom: 24px;
+            flex-wrap: wrap;
         }
 
         .stat-card {
             flex: 1;
+            min-width: 100px;
             background: var(--surface-light);
-            border-radius: 20px;
-            padding: 16px;
+            border-radius: 24px;
+            padding: 16px 12px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
+        .stat-card:active { transform: scale(0.96); }
+
         .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
+            font-size: clamp(24px, 7vw, 32px);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted-light);
-            margin-top: 4px;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
         }
 
+        /* Progress Section */
         .progress-section, .card {
             background: var(--surface-light);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-light);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .progress-bar {
             height: 10px;
             background: var(--border-light);
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            transition: width 0.5s ease;
+            border-radius: 12px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .progress-text {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted-light);
-            margin-top: 8px;
+            margin-top: 10px;
             text-align: center;
         }
 
+        /* Task Card */
         .task-card {
             background: var(--surface-light);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 14px;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.25s ease;
             animation: slideIn 0.3s ease;
+            border: 1px solid var(--border-light);
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
+            from { opacity: 0; transform: translateX(-15px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
+        .task-card:active { transform: scale(0.99); }
+
         .checkbox {
-            width: 24px;
-            height: 24px;
-            border-radius: 12px;
+            width: 26px;
+            height: 26px;
+            border-radius: 13px;
             border: 2px solid var(--border-light);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
         .checkbox.completed {
             background: var(--success);
             border-color: var(--success);
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         .checkbox.completed::after {
@@ -215,66 +244,62 @@
             font-weight: bold;
         }
 
-        .task-content {
-            flex: 1;
-        }
-
+        .task-content { flex: 1; }
         .task-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-light);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
-
         .task-title.completed {
             text-decoration: line-through;
-            opacity: 0.6;
+            opacity: 0.55;
         }
 
         .priority-badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
+        .priority-high { background: rgba(239,68,68,0.15); color: #EF4444; }
+        .priority-medium { background: rgba(245,158,11,0.15); color: #F59E0B; }
+        .priority-low { background: rgba(16,185,129,0.15); color: #10B981; }
 
-        .priority-high { background: rgba(239,68,68,0.2); color: #EF4444; }
-        .priority-medium { background: rgba(245,158,11,0.2); color: #F59E0B; }
-        .priority-low { background: rgba(16,185,129,0.2); color: #10B981; }
-
-        .task-actions {
-            display: flex;
-            gap: 8px;
-        }
-
+        .task-actions { display: flex; gap: 8px; }
         .task-btn {
             background: none;
             border: none;
             font-size: 18px;
-            padding: 6px;
+            padding: 8px;
             cursor: pointer;
-            opacity: 0.7;
+            opacity: 0.6;
             transition: opacity 0.2s;
         }
+        .task-btn:hover { opacity: 1; }
 
+        /* FAB Button */
         .fab {
             position: fixed;
-            bottom: 80px;
+            bottom: calc(70px + var(--safe-bottom));
             right: 20px;
             width: 56px;
             height: 56px;
             border-radius: 28px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            font-size: 32px;
+            font-size: 30px;
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99,102,241,0.4);
-            transition: all 0.2s ease;
+            box-shadow: 0 6px 16px rgba(99,102,241,0.4);
+            transition: all 0.25s;
             z-index: 100;
         }
+        .fab:active { transform: scale(0.92); }
 
+        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -283,9 +308,10 @@
             max-width: 500px;
             margin: 0 auto;
             background: var(--surface-light);
+            backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
-            padding: 12px 20px;
+            padding: 10px 16px calc(10px + var(--safe-bottom));
             border-top: 1px solid var(--border-light);
             z-index: 100;
         }
@@ -297,14 +323,15 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
+            border-radius: 30px;
             transition: all 0.2s;
         }
+        .nav-icon { font-size: 22px; }
+        .nav-label { font-size: 10px; color: var(--text-muted-light); margin-top: 4px; }
+        .nav-item.active .nav-label { color: var(--primary); font-weight: 600; }
 
-        .nav-icon { font-size: 24px; }
-        .nav-label { font-size: 11px; color: var(--text-muted-light); margin-top: 4px; }
-        .nav-item.active .nav-label { color: var(--primary); }
-
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -317,16 +344,15 @@
             align-items: flex-end;
             justify-content: center;
         }
-
         .modal.active { display: flex; }
 
         .modal-content {
             background: var(--surface-light);
             width: 100%;
             max-width: 500px;
-            border-radius: 28px 28px 0 0;
-            padding: 24px;
-            animation: slideUp 0.3s ease;
+            border-radius: 32px 32px 0 0;
+            padding: 24px 20px 32px;
+            animation: slideUp 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
         @keyframes slideUp {
@@ -335,7 +361,7 @@
         }
 
         .modal-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text-light);
             text-align: center;
@@ -346,58 +372,56 @@
             width: 100%;
             padding: 14px;
             border: 1px solid var(--border-light);
-            border-radius: 14px;
-            font-size: 16px;
-            margin-bottom: 12px;
+            border-radius: 16px;
+            font-size: 15px;
+            margin-bottom: 14px;
             background: var(--bg-light);
             color: var(--text-light);
         }
-
-        .modal-textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
+        .modal-textarea { min-height: 80px; resize: vertical; }
 
         .priority-group {
             display: flex;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
         }
-
         .priority-option {
             flex: 1;
-            padding: 10px;
-            border-radius: 14px;
+            padding: 10px 6px;
+            border-radius: 40px;
             background: var(--bg-light);
             border: 1px solid var(--border-light);
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
         }
-
         .priority-option.selected {
             background: var(--primary);
             border-color: var(--primary);
+            color: white;
         }
-        .priority-option.selected span { color: white; }
 
         .modal-buttons {
             display: flex;
             gap: 12px;
+            margin-top: 8px;
         }
-
         .modal-btn {
             flex: 1;
             padding: 14px;
-            border-radius: 14px;
+            border-radius: 40px;
             text-align: center;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
         }
-
         .modal-btn.cancel { background: var(--border-light); color: var(--text-muted-light); }
         .modal-btn.save { background: var(--primary); color: white; }
 
+        /* Auth Screen */
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -405,115 +429,94 @@
             justify-content: center;
             padding: 24px;
         }
-
         .auth-card {
             background: var(--surface-light);
-            border-radius: 32px;
+            border-radius: 48px;
             padding: 40px 24px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .logo {
-            font-size: 48px;
+            max-width: 380px;
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.2);
             text-align: center;
-            margin-bottom: 20px;
         }
-
+        .logo { font-size: 52px; margin-bottom: 16px; }
         .auth-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
-            text-align: center;
             color: var(--text-light);
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
-
         .auth-input {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid var(--border-light);
-            border-radius: 14px;
-            font-size: 16px;
-            margin-bottom: 16px;
+            border-radius: 60px;
+            font-size: 15px;
+            margin-bottom: 14px;
             background: var(--bg-light);
             color: var(--text-light);
         }
-
         .auth-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            border-radius: 14px;
+            border-radius: 60px;
             color: white;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
         }
-
         .switch-auth {
-            text-align: center;
             margin-top: 20px;
             color: var(--primary);
             cursor: pointer;
+            font-size: 14px;
         }
-
         .setting-item {
             background: var(--surface-light);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 20px;
+            padding: 14px 16px;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid var(--border-light);
         }
-
-        .setting-label { font-size: 16px; font-weight: 500; color: var(--text-light); }
-
         .lang-group { display: flex; gap: 8px; }
         .lang-btn {
             padding: 6px 16px;
             background: var(--bg-light);
             border: 1px solid var(--border-light);
-            border-radius: 20px;
+            border-radius: 30px;
             cursor: pointer;
-            color: var(--text-light);
+            font-size: 13px;
         }
         .lang-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
         .logout-btn {
-            background: linear-gradient(135deg, var(--danger), #DC2626);
+            background: var(--danger);
             color: white;
             text-align: center;
-            padding: 16px;
-            border-radius: 16px;
+            padding: 14px;
+            border-radius: 60px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
         }
-
-        .empty-state { text-align: center; padding: 50px; color: var(--text-muted-light); }
-
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted-light); }
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 50px;
+            border-radius: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 44px;
             font-weight: bold;
             margin: 0 auto 16px;
             color: white;
         }
-
-        .profile-name { text-align: center; font-size: 24px; font-weight: bold; color: var(--text-light); margin-bottom: 4px; }
-        .profile-email { text-align: center; color: var(--text-muted-light); margin-bottom: 24px; }
-
         .toast {
             position: fixed;
             bottom: 100px;
@@ -524,12 +527,13 @@
             background: var(--surface-light);
             color: var(--text-light);
             padding: 12px 20px;
-            border-radius: 50px;
+            border-radius: 60px;
             text-align: center;
             z-index: 300;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
             border-left: 4px solid var(--success);
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
@@ -539,14 +543,14 @@
     <div id="authScreen" class="screen active">
         <div class="auth-container">
             <div class="auth-card">
-                <div class="logo">✅ TaskMaster Pro</div>
+                <div class="logo">✅</div>
                 <div class="auth-title" id="authTitle">Welcome Back!</div>
                 <input type="text" id="loginName" class="auth-input" placeholder="Full Name" style="display: none;">
                 <input type="email" id="loginEmail" class="auth-input" placeholder="Email">
                 <input type="password" id="loginPassword" class="auth-input" placeholder="Password">
                 <button class="auth-btn" onclick="handleAuth()" id="authBtn">Login</button>
                 <div class="switch-auth" onclick="toggleAuthMode()" id="switchAuth">Don't have an account? Sign Up</div>
-                <div class="demo-hint" style="text-align:center; margin-top:20px; font-size:12px; color:var(--text-muted-light);">✨ Demo: any email + any password</div>
+                <div style="font-size: 11px; margin-top: 20px; color: var(--text-muted-light);">✨ Demo: any email + any password</div>
             </div>
         </div>
     </div>
@@ -567,18 +571,18 @@
                 <div class="stat-card"><div class="stat-number" id="pendingTasks">0</div><div class="stat-label" id="pendingLabel">Pending</div></div>
             </div>
             <div class="progress-section">
-                <div class="section-title" id="progressTitle">📊 Today's Progress</div>
+                <div class="section-title">📊 <span id="progressTitle">Today's Progress</span></div>
                 <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
                 <div class="progress-text" id="progressText">0% Complete</div>
             </div>
             <div class="card">
-                <div class="section-title" id="quoteTitle">💡 Quote of the Day</div>
+                <div class="section-title">💡 <span id="quoteTitle">Quote of the Day</span></div>
                 <div id="quoteOfDay" style="color: var(--text-muted-light); font-style: italic;">"The secret of getting ahead is getting started."</div>
             </div>
         </div>
 
         <div id="tasksScreen" class="screen">
-            <div class="section-title" id="myTasksTitle" style="margin-bottom: 16px;">📋 My Tasks</div>
+            <div class="section-title">📋 <span id="myTasksTitle">My Tasks</span></div>
             <div id="tasksList"></div>
         </div>
 
@@ -587,39 +591,21 @@
             <div class="profile-name" id="profileName">User</div>
             <div class="profile-email" id="profileEmail">user@example.com</div>
             <div class="card">
-                <div class="setting-item"><span class="setting-label" id="memberSinceLabel">📊 Member since</span><span id="memberSince">2024</span></div>
-                <div class="setting-item"><span class="setting-label" id="tasksCompletedLabel">✅ Tasks completed</span><span id="profileCompleted">0</span></div>
-                <div class="setting-item"><span class="setting-label" id="streakLabel">🏆 Current streak</span><span id="streak">0 days</span></div>
+                <div class="setting-item"><span id="memberSinceLabel">📊 Member since</span><span id="memberSince">2024</span></div>
+                <div class="setting-item"><span id="tasksCompletedLabel">✅ Tasks completed</span><span id="profileCompleted">0</span></div>
+                <div class="setting-item"><span id="streakLabel">🏆 Current streak</span><span id="streak">0 days</span></div>
             </div>
             <div class="logout-btn" onclick="logout()" id="logoutBtn">🚪 Logout</div>
         </div>
 
         <div id="settingsScreen" class="screen">
-            <div class="section-title" id="settingsTitle" style="margin-bottom: 16px;">⚙️ Settings</div>
-            <div class="setting-item">
-                <span class="setting-label" id="darkModeLabel">🌙 Dark Mode</span>
-                <button class="theme-toggle" onclick="toggleTheme()" style="width: auto; padding: 8px 20px;" id="darkModeBtn">OFF</button>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label" id="languageLabel">🌐 Language</span>
-                <div class="lang-group">
-                    <button class="lang-btn" onclick="setLanguage('en')" id="langEn">English</button>
-                    <button class="lang-btn" onclick="setLanguage('ar')" id="langAr">العربية</button>
-                </div>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label" id="notifLabel">🔔 Notifications</span>
-                <button class="theme-toggle" onclick="toggleNotifications()" style="width: auto; padding: 8px 20px;" id="notifBtn">ON</button>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label" id="exportLabel">💾 Export Data</span>
-                <button class="theme-toggle" onclick="exportData()" style="width: auto; padding: 8px 20px;" id="exportBtn">Export</button>
-            </div>
-            <div class="setting-item"><span class="setting-label" id="versionLabel">ℹ️ Version</span><span>2.0.0</span></div>
-            <div class="setting-item">
-                <span class="setting-label" id="installLabel">📱 Install App</span>
-                <button class="theme-toggle" onclick="installApp()" style="width: auto; padding: 8px 20px;" id="installBtn">Install</button>
-            </div>
+            <div class="section-title">⚙️ <span id="settingsTitle">Settings</span></div>
+            <div class="setting-item"><span id="darkModeLabel">🌙 Dark Mode</span><button class="theme-toggle" onclick="toggleTheme()" style="width: auto; padding: 6px 20px;" id="darkModeBtn">OFF</button></div>
+            <div class="setting-item"><span id="languageLabel">🌐 Language</span><div class="lang-group"><button class="lang-btn" onclick="setLanguage('en')" id="langEn">English</button><button class="lang-btn" onclick="setLanguage('ar')" id="langAr">العربية</button></div></div>
+            <div class="setting-item"><span id="notifLabel">🔔 Notifications</span><button class="theme-toggle" onclick="toggleNotifications()" style="width: auto; padding: 6px 20px;" id="notifBtn">ON</button></div>
+            <div class="setting-item"><span id="exportLabel">💾 Export Data</span><button class="theme-toggle" onclick="exportData()" style="width: auto; padding: 6px 20px;" id="exportBtn">Export</button></div>
+            <div class="setting-item"><span id="versionLabel">ℹ️ Version</span><span>3.0.0</span></div>
+            <div class="setting-item"><span id="installLabel">📱 Install App</span><button class="theme-toggle" onclick="installApp()" style="width: auto; padding: 6px 20px;" id="installBtn">Install</button></div>
         </div>
 
         <div class="bottom-nav">
@@ -632,6 +618,7 @@
         <button class="fab" onclick="openAddTaskModal()">+</button>
     </div>
 
+    <!-- Task Modal -->
     <div id="taskModal" class="modal">
         <div class="modal-content">
             <div class="modal-title" id="modalTitle">New Task</div>
@@ -651,533 +638,126 @@
 </div>
 
 <script>
-    // ============ TRANSLATIONS DATABASE ============
+    // ---------- TRANSLATIONS ----------
     const translations = {
         en: {
-            // Auth
-            welcome: 'Welcome Back!',
-            signup: 'Create Account',
-            login: 'Login',
-            noAccount: "Don't have an account? Sign Up",
-            hasAccount: "Already have an account? Login",
-            // Navigation
-            home: 'Home',
-            tasks: 'Tasks',
-            profile: 'Profile',
-            settings: 'Settings',
-            // Stats
-            total: 'Total',
-            done: 'Done',
-            pending: 'Pending',
-            progress: "📊 Today's Progress",
-            complete: 'Complete',
-            myTasks: '📋 My Tasks',
-            // Task modal
-            newTask: 'New Task',
-            editTask: 'Edit Task',
-            taskTitle: 'Task title',
-            description: 'Description (optional)',
-            low: '🌿 Low',
-            medium: '⚡ Medium',
-            high: '🔥 High',
-            cancel: 'Cancel',
-            save: 'Save',
-            delete: 'Delete',
-            noTasks: 'No tasks yet. Tap + to add!',
-            // Settings
-            darkMode: '🌙 Dark Mode',
-            language: '🌐 Language',
-            notifications: '🔔 Notifications',
-            exportData: '💾 Export Data',
-            version: 'ℹ️ Version',
-            installApp: '📱 Install App',
-            // Profile
-            memberSince: '📊 Member since',
-            tasksCompleted: '✅ Tasks completed',
-            streak: '🏆 Current streak',
-            logout: '🚪 Logout',
-            days: 'days',
-            // Quotes
-            quoteTitle: '💡 Quote of the Day',
-            // Buttons
-            on: 'ON',
-            off: 'OFF',
-            export: 'Export',
-            install: 'Install'
+            welcome:'Welcome Back!', signup:'Create Account', login:'Login', noAccount:"Don't have an account? Sign Up", hasAccount:"Already have an account? Login",
+            home:'Home', tasks:'Tasks', profile:'Profile', settings:'Settings', total:'Total', done:'Done', pending:'Pending',
+            progress:"Today's Progress", myTasks:'My Tasks', newTask:'New Task', editTask:'Edit Task',
+            taskTitle:'Task title', description:'Description (optional)', low:'🌿 Low', medium:'⚡ Medium', high:'🔥 High',
+            cancel:'Cancel', save:'Save', delete:'Delete', noTasks:'No tasks yet. Tap + to add!',
+            darkMode:'🌙 Dark Mode', language:'🌐 Language', notifications:'🔔 Notifications', exportData:'💾 Export Data',
+            version:'ℹ️ Version', installApp:'📱 Install App', memberSince:'📊 Member since', tasksCompleted:'✅ Tasks completed',
+            streak:'🏆 Current streak', logout:'🚪 Logout', days:'days', quoteTitle:'Quote of the Day', complete:'Complete'
         },
         ar: {
-            // Auth
-            welcome: 'مرحباً بعودتك!',
-            signup: 'إنشاء حساب',
-            login: 'تسجيل الدخول',
-            noAccount: 'ليس لديك حساب؟ إنشاء حساب',
-            hasAccount: 'لديك حساب؟ تسجيل الدخول',
-            // Navigation
-            home: 'الرئيسية',
-            tasks: 'المهام',
-            profile: 'الملف الشخصي',
-            settings: 'الإعدادات',
-            // Stats
-            total: 'الإجمالي',
-            done: 'مكتملة',
-            pending: 'معلقة',
-            progress: "📊 تقدم اليوم",
-            complete: 'مكتمل',
-            myTasks: '📋 مهامي',
-            // Task modal
-            newTask: 'مهمة جديدة',
-            editTask: 'تعديل مهمة',
-            taskTitle: 'عنوان المهمة',
-            description: 'الوصف (اختياري)',
-            low: '🌿 منخفضة',
-            medium: '⚡ متوسطة',
-            high: '🔥 عالية',
-            cancel: 'إلغاء',
-            save: 'حفظ',
-            delete: 'حذف',
-            noTasks: 'لا توجد مهام. اضغط + لإضافة مهمة!',
-            // Settings
-            darkMode: '🌙 الوضع الليلي',
-            language: '🌐 اللغة',
-            notifications: '🔔 الإشعارات',
-            exportData: '💾 تصدير البيانات',
-            version: 'ℹ️ الإصدار',
-            installApp: '📱 تثبيت التطبيق',
-            // Profile
-            memberSince: '📊 عضو منذ',
-            tasksCompleted: '✅ المهام المكتملة',
-            streak: '🏆 الإنجاز المتواصل',
-            logout: '🚪 تسجيل الخروج',
-            days: 'يوم',
-            // Quotes
-            quoteTitle: '💡 اقتباس اليوم',
-            // Buttons
-            on: 'تشغيل',
-            off: 'إيقاف',
-            export: 'تصدير',
-            install: 'تثبيت'
+            welcome:'مرحباً بعودتك!', signup:'إنشاء حساب', login:'تسجيل الدخول', noAccount:'ليس لديك حساب؟ إنشاء حساب', hasAccount:'لديك حساب؟ تسجيل الدخول',
+            home:'الرئيسية', tasks:'المهام', profile:'الملف الشخصي', settings:'الإعدادات', total:'الإجمالي', done:'مكتملة', pending:'معلقة',
+            progress:"تقدم اليوم", myTasks:'مهامي', newTask:'مهمة جديدة', editTask:'تعديل مهمة',
+            taskTitle:'عنوان المهمة', description:'الوصف (اختياري)', low:'🌿 منخفضة', medium:'⚡ متوسطة', high:'🔥 عالية',
+            cancel:'إلغاء', save:'حفظ', delete:'حذف', noTasks:'لا توجد مهام. اضغط + لإضافة مهمة!',
+            darkMode:'🌙 الوضع الليلي', language:'🌐 اللغة', notifications:'🔔 الإشعارات', exportData:'💾 تصدير البيانات',
+            version:'ℹ️ الإصدار', installApp:'📱 تثبيت التطبيق', memberSince:'📊 عضو منذ', tasksCompleted:'✅ المهام المكتملة',
+            streak:'🏆 الإنجاز المتواصل', logout:'🚪 تسجيل الخروج', days:'يوم', quoteTitle:'اقتباس اليوم', complete:'مكتمل'
         }
     };
+    const quotes = { en:["✨ The secret of getting ahead is getting started.","🎯 Done is better than perfect.","📈 Small progress is still progress.","⭐ You don't have to be great to start.","⚡ Productivity is never an accident."], ar:["✨ سر التقدم هو البدء.","🎯 المنجز أفضل من المثالي.","📈 التقدم الصغير لا يزال تقدماً.","⭐ لست بحاجة لأن تكون عظيماً لتبدأ.","⚡ الإنتاجية ليست حادثة أبداً."] };
 
-    // Quotes
-    const quotes = {
-        en: [
-            "✨ The secret of getting ahead is getting started. - Mark Twain",
-            "🎯 Done is better than perfect. - Facebook",
-            "📈 Small progress is still progress.",
-            "⭐ You don't have to be great to start, but you have to start to be great.",
-            "⚡ Productivity is never an accident."
-        ],
-        ar: [
-            "✨ سر التقدم هو البدء. - مارك توين",
-            "🎯 المنجز أفضل من المثالي.",
-            "📈 التقدم الصغير لا يزال تقدماً.",
-            "⭐ لست بحاجة لأن تكون عظيماً لتبدأ، لكن عليك أن تبدأ لتكون عظيماً.",
-            "⚡ الإنتاجية ليست حادثة أبداً."
-        ]
-    };
+    let currentLanguage='en', darkMode=false, notificationsEnabled=true, tasks=[], editingTaskId=null, selectedPriority='medium', currentUser={email:'', name:'User', joined:new Date().toISOString()}, deferredPrompt;
+    function t(k){ return translations[currentLanguage][k] || translations.en[k] || k; }
 
-    // ============ App State ============
-    let isLoggedIn = false;
-    let darkMode = false;
-    let currentLanguage = 'en';
-    let notificationsEnabled = true;
-    let tasks = [];
-    let editingTaskId = null;
-    let selectedPriority = 'medium';
-    let currentUser = { email: '', name: 'User', joined: new Date().toISOString() };
-    let deferredPrompt;
-
-    // ============ Translation Function ============
-    function t(key) {
-        return translations[currentLanguage][key] || translations.en[key] || key;
+    function applyLanguage(){
+        const isLogin=document.getElementById('authTitle').innerText===t('welcome');
+        document.getElementById('authTitle').innerText=isLogin?t('welcome'):t('signup');
+        document.getElementById('authBtn').innerText=(document.getElementById('authBtn').innerText==='Login'||document.getElementById('authBtn').innerText==='تسجيل الدخول')?t('login'):t('signup');
+        document.getElementById('switchAuth').innerHTML=(document.getElementById('switchAuth').innerHTML.includes('Sign Up')||document.getElementById('switchAuth').innerHTML.includes('إنشاء حساب'))?t('noAccount'):t('hasAccount');
+        document.getElementById('loginName').placeholder='Full Name'; document.getElementById('loginEmail').placeholder='Email'; document.getElementById('loginPassword').placeholder='Password';
+        document.getElementById('navHome').innerText=t('home'); document.getElementById('navTasks').innerText=t('tasks'); document.getElementById('navProfile').innerText=t('profile'); document.getElementById('navSettings').innerText=t('settings');
+        document.getElementById('totalLabel').innerText=t('total'); document.getElementById('doneLabel').innerText=t('done'); document.getElementById('pendingLabel').innerText=t('pending');
+        document.getElementById('progressTitle').innerText=t('progress'); document.getElementById('quoteTitle').innerText=t('quoteTitle'); document.getElementById('myTasksTitle').innerText=t('myTasks');
+        document.getElementById('memberSinceLabel').innerHTML=t('memberSince'); document.getElementById('tasksCompletedLabel').innerHTML=t('tasksCompleted'); document.getElementById('streakLabel').innerHTML=t('streak'); document.getElementById('logoutBtn').innerHTML=t('logout');
+        document.getElementById('settingsTitle').innerHTML=t('settings'); document.getElementById('darkModeLabel').innerHTML=t('darkMode'); document.getElementById('languageLabel').innerHTML=t('language');
+        document.getElementById('notifLabel').innerHTML=t('notifications'); document.getElementById('exportLabel').innerHTML=t('exportData'); document.getElementById('versionLabel').innerHTML=t('version'); document.getElementById('installLabel').innerHTML=t('installApp');
+        document.getElementById('exportBtn').innerText=t('exportData'); document.getElementById('installBtn').innerText=t('installApp'); document.getElementById('darkModeBtn').innerText=darkMode?'ON':'OFF'; document.getElementById('notifBtn').innerText=notificationsEnabled?'ON':'OFF';
+        document.getElementById('modalTitle').innerText=editingTaskId?t('editTask'):t('newTask'); document.getElementById('taskTitle').placeholder=t('taskTitle'); document.getElementById('taskDesc').placeholder=t('description');
+        document.getElementById('lowText').innerHTML=t('low'); document.getElementById('mediumText').innerHTML=t('medium'); document.getElementById('highText').innerHTML=t('high'); document.getElementById('cancelBtn').innerText=t('cancel'); document.getElementById('saveBtn').innerText=t('save');
+        document.getElementById('langEn').classList.toggle('active',currentLanguage==='en'); document.getElementById('langAr').classList.toggle('active',currentLanguage==='ar');
+        if(currentLanguage==='ar'){ document.body.classList.remove('ltr'); document.body.classList.add('rtl'); } else { document.body.classList.remove('rtl'); document.body.classList.add('ltr'); }
+        updateStats(); updateQuote();
     }
-
-    // ============ Apply Language to All UI Elements ============
-    function applyLanguage() {
-        // Auth screen
-        const isLoginMode = document.getElementById('authTitle').innerText === 'Welcome Back!' || document.getElementById('authTitle').innerText === 'مرحباً بعودتك!';
-        document.getElementById('authTitle').innerText = isLoginMode ? t('welcome') : t('signup');
-        document.getElementById('authBtn').innerText = (document.getElementById('authBtn').innerText === 'Login' || document.getElementById('authBtn').innerText === 'تسجيل الدخول') ? t('login') : t('signup');
-        document.getElementById('switchAuth').innerHTML = (document.getElementById('switchAuth').innerHTML.includes('Sign Up') || document.getElementById('switchAuth').innerHTML.includes('إنشاء حساب')) ? t('noAccount') : t('hasAccount');
-        document.getElementById('loginName').placeholder = 'Full Name';
-        document.getElementById('loginEmail').placeholder = 'Email';
-        document.getElementById('loginPassword').placeholder = 'Password';
-        
-        // Navigation
-        document.getElementById('navHome').innerText = t('home');
-        document.getElementById('navTasks').innerText = t('tasks');
-        document.getElementById('navProfile').innerText = t('profile');
-        document.getElementById('navSettings').innerText = t('settings');
-        
-        // Home screen
-        document.getElementById('totalLabel').innerText = t('total');
-        document.getElementById('doneLabel').innerText = t('done');
-        document.getElementById('pendingLabel').innerText = t('pending');
-        document.getElementById('progressTitle').innerHTML = t('progress');
-        document.getElementById('quoteTitle').innerHTML = t('quoteTitle');
-        
-        // Tasks screen
-        document.getElementById('myTasksTitle').innerHTML = t('myTasks');
-        
-        // Profile screen
-        document.getElementById('memberSinceLabel').innerHTML = t('memberSince');
-        document.getElementById('tasksCompletedLabel').innerHTML = t('tasksCompleted');
-        document.getElementById('streakLabel').innerHTML = t('streak');
-        document.getElementById('logoutBtn').innerHTML = t('logout');
-        
-        // Settings screen
-        document.getElementById('settingsTitle').innerHTML = '⚙️ ' + t('settings');
-        document.getElementById('darkModeLabel').innerHTML = t('darkMode');
-        document.getElementById('languageLabel').innerHTML = t('language');
-        document.getElementById('notifLabel').innerHTML = t('notifications');
-        document.getElementById('exportLabel').innerHTML = t('exportData');
-        document.getElementById('versionLabel').innerHTML = t('version');
-        document.getElementById('installLabel').innerHTML = t('installApp');
-        document.getElementById('exportBtn').innerText = t('export');
-        document.getElementById('installBtn').innerText = t('install');
-        document.getElementById('darkModeBtn').innerText = darkMode ? t('on') : t('off');
-        document.getElementById('notifBtn').innerText = notificationsEnabled ? t('on') : t('off');
-        
-        // Modal
-        document.getElementById('modalTitle').innerText = editingTaskId ? t('editTask') : t('newTask');
-        document.getElementById('taskTitle').placeholder = t('taskTitle');
-        document.getElementById('taskDesc').placeholder = t('description');
-        document.getElementById('lowText').innerHTML = t('low');
-        document.getElementById('mediumText').innerHTML = t('medium');
-        document.getElementById('highText').innerHTML = t('high');
-        document.getElementById('cancelBtn').innerText = t('cancel');
-        document.getElementById('saveBtn').innerText = t('save');
-        
-        // Language buttons highlight
-        document.getElementById('langEn').classList.toggle('active', currentLanguage === 'en');
-        document.getElementById('langAr').classList.toggle('active', currentLanguage === 'ar');
-        
-        // Direction
-        if (currentLanguage === 'ar') {
-            document.body.classList.remove('ltr');
-            document.body.classList.add('rtl');
-        } else {
-            document.body.classList.remove('rtl');
-            document.body.classList.add('ltr');
-        }
-        
-        // Update stats numbers labels
-        updateStats();
-        updateQuote();
+    function loadData(){
+        let saved=localStorage.getItem('tasks'); if(saved) tasks=JSON.parse(saved);
+        let u=localStorage.getItem('user'); if(u) currentUser=JSON.parse(u);
+        if(localStorage.getItem('darkMode')==='true') darkMode=true;
+        if(localStorage.getItem('language')) currentLanguage=localStorage.getItem('language');
+        if(localStorage.getItem('notifications')!==null) notificationsEnabled=localStorage.getItem('notifications')==='true';
+        applyTheme(); applyLanguage(); renderTasks();
     }
-
-    // ============ Load/Save ============
-    function loadData() {
-        const savedTasks = localStorage.getItem('tasks');
-        if (savedTasks) tasks = JSON.parse(savedTasks);
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) currentUser = JSON.parse(savedUser);
-        const savedTheme = localStorage.getItem('darkMode');
-        if (savedTheme === 'true') darkMode = true;
-        const savedLang = localStorage.getItem('language');
-        if (savedLang) currentLanguage = savedLang;
-        const savedNotif = localStorage.getItem('notifications');
-        if (savedNotif !== null) notificationsEnabled = savedNotif === 'true';
-        applyTheme();
-        applyLanguage();
-        renderTasks();
-    }
-
-    function saveTasks() { localStorage.setItem('tasks', JSON.stringify(tasks)); }
-    function saveUser() { localStorage.setItem('user', JSON.stringify(currentUser)); }
-
-    // ============ Auth ============
-    function handleAuth() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const name = document.getElementById('loginName').value;
-        const isSignup = document.getElementById('authTitle').innerText === t('signup');
-        
-        if (!email || !password) { showToast('Please fill all fields'); return; }
-        if (isSignup && !name) { showToast('Please enter your name'); return; }
-        
-        if (isSignup) {
-            currentUser = { email: email, name: name, joined: new Date().toISOString() };
-        } else {
-            currentUser = { ...currentUser, email: email };
-        }
+    function saveTasks(){ localStorage.setItem('tasks',JSON.stringify(tasks)); }
+    function saveUser(){ localStorage.setItem('user',JSON.stringify(currentUser)); }
+    function handleAuth(){
+        let email=document.getElementById('loginEmail').value, pwd=document.getElementById('loginPassword').value, name=document.getElementById('loginName').value, isSignup=document.getElementById('authTitle').innerText===t('signup');
+        if(!email||!pwd){ showToast('Please fill all fields'); return; }
+        if(isSignup&&!name){ showToast('Please enter your name'); return; }
+        if(isSignup) currentUser={email,name,joined:new Date().toISOString()};
+        else currentUser={...currentUser,email};
         saveUser();
-        isLoggedIn = true;
         document.getElementById('authScreen').classList.remove('active');
-        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('mainApp').style.display='block';
         document.getElementById('homeScreen').classList.add('active');
-        updateProfile();
-        loadData();
-        showToast(isSignup ? 'Account created successfully!' : 'Welcome back!');
-        if (notificationsEnabled && 'Notification' in window) Notification.requestPermission();
+        updateProfile(); loadData(); showToast(isSignup?'Account created!':'Welcome back!');
+        if(notificationsEnabled&&'Notification' in window) Notification.requestPermission();
     }
-
-    function toggleAuthMode() {
-        const isLogin = document.getElementById('authTitle').innerText === t('welcome');
-        if (isLogin) {
-            document.getElementById('authTitle').innerText = t('signup');
-            document.getElementById('authBtn').innerText = t('signup');
-            document.getElementById('switchAuth').innerHTML = t('hasAccount');
-            document.getElementById('loginName').style.display = 'block';
-        } else {
-            document.getElementById('authTitle').innerText = t('welcome');
-            document.getElementById('authBtn').innerText = t('login');
-            document.getElementById('switchAuth').innerHTML = t('noAccount');
-            document.getElementById('loginName').style.display = 'none';
-        }
+    function toggleAuthMode(){
+        let isLogin=document.getElementById('authTitle').innerText===t('welcome');
+        if(isLogin){ document.getElementById('authTitle').innerText=t('signup'); document.getElementById('authBtn').innerText=t('signup'); document.getElementById('switchAuth').innerHTML=t('hasAccount'); document.getElementById('loginName').style.display='block'; }
+        else{ document.getElementById('authTitle').innerText=t('welcome'); document.getElementById('authBtn').innerText=t('login'); document.getElementById('switchAuth').innerHTML=t('noAccount'); document.getElementById('loginName').style.display='none'; }
     }
-
-    function logout() {
-        isLoggedIn = false;
-        localStorage.removeItem('user');
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('authScreen').classList.add('active');
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('loginName').value = '';
-        showToast('Logged out successfully');
-    }
-
-    // ============ Tasks ============
-    function renderTasks() {
-        const container = document.getElementById('tasksList');
-        if (tasks.length === 0) {
-            container.innerHTML = `<div class="empty-state">📋 ${t('noTasks')}</div>`;
-            return;
-        }
-        container.innerHTML = tasks.map(task => `
-            <div class="task-card">
-                <div class="checkbox ${task.completed ? 'completed' : ''}" onclick="toggleTask('${task.id}')"></div>
-                <div class="task-content">
-                    <div class="task-title ${task.completed ? 'completed' : ''}">${escapeHtml(task.title)}</div>
-                    ${task.description ? `<div style="font-size: 12px; color: var(--text-muted-light);">${escapeHtml(task.description)}</div>` : ''}
-                    <span class="priority-badge priority-${task.priority}">${task.priority === 'high' ? t('high') : task.priority === 'medium' ? t('medium') : t('low')}</span>
-                </div>
-                <div class="task-actions">
-                    <button class="task-btn" onclick="editTask('${task.id}')">✏️</button>
-                    <button class="task-btn" onclick="deleteTask('${task.id}')">🗑️</button>
-                </div>
-            </div>
-        `).join('');
+    function logout(){ localStorage.removeItem('user'); document.getElementById('mainApp').style.display='none'; document.getElementById('authScreen').classList.add('active'); showToast('Logged out'); }
+    function renderTasks(){
+        let container=document.getElementById('tasksList');
+        if(tasks.length===0){ container.innerHTML=`<div class="empty-state">📋 ${t('noTasks')}</div>`; return; }
+        container.innerHTML=tasks.map(task=>`<div class="task-card"><div class="checkbox ${task.completed?'completed':''}" onclick="toggleTask('${task.id}')"></div><div class="task-content"><div class="task-title ${task.completed?'completed':''}">${escapeHtml(task.title)}</div>${task.description?`<div style="font-size:12px;color:var(--text-muted-light);margin-bottom:4px;">${escapeHtml(task.description)}</div>`:''}<span class="priority-badge priority-${task.priority}">${task.priority==='high'?t('high'):task.priority==='medium'?t('medium'):t('low')}</span></div><div class="task-actions"><button class="task-btn" onclick="editTask('${task.id}')">✏️</button><button class="task-btn" onclick="deleteTask('${task.id}')">🗑️</button></div></div>`).join('');
         updateStats();
     }
-
-    function toggleTask(id) {
-        const task = tasks.find(t => t.id === id);
-        if (task) {
-            task.completed = !task.completed;
-            saveTasks();
-            renderTasks();
-            updateStats();
-            if (task.completed && notificationsEnabled) showToast(`✅ Task completed: ${task.title}`);
-        }
+    function toggleTask(id){ let tsk=tasks.find(t=>t.id===id); if(tsk){ tsk.completed=!tsk.completed; saveTasks(); renderTasks(); updateStats(); if(tsk.completed&&notificationsEnabled) showToast(`✅ Task completed`); } }
+    function deleteTask(id){ if(confirm(t('delete')+'?')){ tasks=tasks.filter(t=>t.id!==id); saveTasks(); renderTasks(); updateStats(); showToast('Task deleted'); } }
+    function editTask(id){ let tsk=tasks.find(t=>t.id===id); if(tsk){ editingTaskId=id; document.getElementById('taskTitle').value=tsk.title; document.getElementById('taskDesc').value=tsk.description||''; selectedPriority=tsk.priority; document.getElementById('modalTitle').innerText=t('editTask'); document.getElementById('taskModal').classList.add('active'); updatePriorityUI(); } }
+    function openAddTaskModal(){ editingTaskId=null; document.getElementById('taskTitle').value=''; document.getElementById('taskDesc').value=''; selectedPriority='medium'; document.getElementById('modalTitle').innerText=t('newTask'); document.getElementById('taskModal').classList.add('active'); updatePriorityUI(); }
+    function closeModal(){ document.getElementById('taskModal').classList.remove('active'); }
+    function selectPriority(p){ selectedPriority=p; updatePriorityUI(); }
+    function updatePriorityUI(){ document.querySelectorAll('.priority-option').forEach(opt=>{ if(opt.dataset.priority===selectedPriority) opt.classList.add('selected'); else opt.classList.remove('selected'); }); }
+    function saveTask(){
+        let title=document.getElementById('taskTitle').value.trim();
+        if(!title){ showToast('Please enter a task title'); return; }
+        let desc=document.getElementById('taskDesc').value.trim();
+        if(editingTaskId){ let idx=tasks.findIndex(t=>t.id===editingTaskId); if(idx!==-1){ tasks[idx]={...tasks[idx],title,description:desc,priority:selectedPriority}; showToast('Task updated'); } }
+        else{ tasks.unshift({id:Date.now().toString(),title,description:desc,priority:selectedPriority,completed:false,createdAt:new Date().toISOString()}); showToast('Task added'); }
+        saveTasks(); renderTasks(); closeModal();
     }
-
-    function deleteTask(id) {
-        if (confirm(t('delete') + '?')) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-            renderTasks();
-            updateStats();
-            showToast('Task deleted');
-        }
+    function updateStats(){
+        let total=tasks.length, completed=tasks.filter(t=>t.completed).length, pending=total-completed, percent=total>0?(completed/total)*100:0;
+        document.getElementById('totalTasks').innerText=total; document.getElementById('completedTasks').innerText=completed; document.getElementById('pendingTasks').innerText=pending;
+        document.getElementById('progressFill').style.width=percent+'%'; document.getElementById('progressText').innerHTML=Math.round(percent)+'% '+t('complete');
+        document.getElementById('profileCompleted').innerText=completed;
+        let streak=0, today=new Date().toDateString(), yesterday=new Date(Date.now()-86400000).toDateString(), ct=tasks.filter(t=>t.completed&&new Date(t.createdAt).toDateString()===today).length, cy=tasks.filter(t=>t.completed&&new Date(t.createdAt).toDateString()===yesterday).length;
+        streak=ct>0?(cy>0?2:1):0; document.getElementById('streak').innerHTML=streak+' '+t('days');
+        let h=new Date().getHours(); document.getElementById('greeting').innerHTML=h<12?'🌅 '+(currentLanguage==='en'?'Good Morning':'صباح الخير'):h<18?'☀️ '+(currentLanguage==='en'?'Good Afternoon':'مساء الخير'):'🌙 '+(currentLanguage==='en'?'Good Evening':'مساء الخير');
+        document.getElementById('date').innerHTML=new Date().toLocaleDateString(currentLanguage==='en'?'en-US':'ar-EG',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
     }
-
-    function editTask(id) {
-        const task = tasks.find(t => t.id === id);
-        if (task) {
-            editingTaskId = id;
-            document.getElementById('taskTitle').value = task.title;
-            document.getElementById('taskDesc').value = task.description || '';
-            selectedPriority = task.priority;
-            document.getElementById('modalTitle').innerText = t('editTask');
-            document.getElementById('taskModal').classList.add('active');
-            updatePriorityUI();
-        }
-    }
-
-    function openAddTaskModal() {
-        editingTaskId = null;
-        document.getElementById('taskTitle').value = '';
-        document.getElementById('taskDesc').value = '';
-        selectedPriority = 'medium';
-        document.getElementById('modalTitle').innerText = t('newTask');
-        document.getElementById('taskModal').classList.add('active');
-        updatePriorityUI();
-    }
-
-    function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
-
-    function selectPriority(priority) { selectedPriority = priority; updatePriorityUI(); }
-
-    function updatePriorityUI() {
-        document.querySelectorAll('.priority-option').forEach(opt => {
-            if (opt.dataset.priority === selectedPriority) opt.classList.add('selected');
-            else opt.classList.remove('selected');
-        });
-    }
-
-    function saveTask() {
-        const title = document.getElementById('taskTitle').value.trim();
-        if (!title) { showToast('Please enter a task title'); return; }
-        const description = document.getElementById('taskDesc').value.trim();
-        if (editingTaskId) {
-            const index = tasks.findIndex(t => t.id === editingTaskId);
-            if (index !== -1) {
-                tasks[index] = { ...tasks[index], title, description, priority: selectedPriority };
-                showToast('Task updated');
-            }
-        } else {
-            tasks.unshift({ id: Date.now().toString(), title, description, priority: selectedPriority, completed: false, createdAt: new Date().toISOString() });
-            showToast('Task added');
-        }
-        saveTasks();
-        renderTasks();
-        closeModal();
-    }
-
-    // ============ Stats ============
-    function updateStats() {
-        const total = tasks.length;
-        const completed = tasks.filter(t => t.completed).length;
-        const pending = total - completed;
-        const percent = total > 0 ? (completed / total) * 100 : 0;
-        document.getElementById('totalTasks').innerText = total;
-        document.getElementById('completedTasks').innerText = completed;
-        document.getElementById('pendingTasks').innerText = pending;
-        document.getElementById('progressFill').style.width = percent + '%';
-        document.getElementById('progressText').innerHTML = Math.round(percent) + '% ' + t('complete');
-        document.getElementById('profileCompleted').innerText = completed;
-        
-        const streak = calculateStreak();
-        document.getElementById('streak').innerHTML = streak + ' ' + t('days');
-        
-        const hour = new Date().getHours();
-        document.getElementById('greeting').innerHTML = hour < 12 ? '🌅 ' + (currentLanguage === 'en' ? 'Good Morning' : 'صباح الخير') : hour < 18 ? '☀️ ' + (currentLanguage === 'en' ? 'Good Afternoon' : 'مساء الخير') : '🌙 ' + (currentLanguage === 'en' ? 'Good Evening' : 'مساء الخير');
-        document.getElementById('date').innerHTML = new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'ar-EG', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    }
-
-    function calculateStreak() {
-        const today = new Date().toDateString();
-        const yesterday = new Date(Date.now() - 86400000).toDateString();
-        const completedToday = tasks.filter(t => t.completed && new Date(t.createdAt).toDateString() === today).length;
-        const completedYesterday = tasks.filter(t => t.completed && new Date(t.createdAt).toDateString() === yesterday).length;
-        if (completedToday > 0) return completedYesterday > 0 ? 2 : 1;
-        return 0;
-    }
-
-    function updateQuote() {
-        const quotesList = quotes[currentLanguage] || quotes.en;
-        const randomQuote = quotesList[Math.floor(Math.random() * quotesList.length)];
-        document.getElementById('quoteOfDay').innerText = randomQuote;
-    }
-
-    // ============ Profile ============
-    function updateProfile() {
-        document.getElementById('profileName').innerText = currentUser.name || 'User';
-        document.getElementById('profileEmail').innerText = currentUser.email;
-        document.getElementById('memberSince').innerHTML = currentUser.joined ? new Date(currentUser.joined).toLocaleDateString() : '2024';
-        const avatarLetter = (currentUser.name?.charAt(0) || 'U').toUpperCase();
-        document.getElementById('profileAvatar').innerHTML = avatarLetter;
-    }
-
-    // ============ Theme ============
-    function toggleTheme() {
-        darkMode = !darkMode;
-        localStorage.setItem('darkMode', darkMode);
-        applyTheme();
-    }
-
-    function applyTheme() {
-        if (darkMode) document.body.classList.add('dark');
-        else document.body.classList.remove('dark');
-        const btn = document.getElementById('darkModeBtn');
-        if (btn) btn.innerText = darkMode ? t('on') : t('off');
-        document.getElementById('themeBtn').innerHTML = darkMode ? '☀️' : '🌙';
-    }
-
-    // ============ Language ============
-    function setLanguage(lang) {
-        currentLanguage = lang;
-        localStorage.setItem('language', lang);
-        applyLanguage();
-        updateQuote();
-        renderTasks();
-    }
-
-    // ============ Notifications ============
-    function toggleNotifications() {
-        notificationsEnabled = !notificationsEnabled;
-        localStorage.setItem('notifications', notificationsEnabled);
-        document.getElementById('notifBtn').innerText = notificationsEnabled ? t('on') : t('off');
-        showToast(notificationsEnabled ? 'Notifications enabled' : 'Notifications disabled');
-        if (notificationsEnabled && 'Notification' in window) Notification.requestPermission();
-    }
-
-    function showToast(message) {
-        const existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerText = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
-    }
-
-    // ============ Export Data ============
-    function exportData() {
-        const data = { tasks, user: currentUser, exportDate: new Date().toISOString() };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `taskmaster_backup_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast('Data exported successfully');
-    }
-
-    // ============ Install App ============
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-
-    function installApp() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-        } else {
-            showToast('Install manually via browser menu (Add to Home Screen)');
-        }
-    }
-
-    // ============ Navigation ============
-    function switchTab(tab) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(`${tab}Screen`).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-        event.target.closest('.nav-item').classList.add('active');
-        if (tab === 'tasks') renderTasks();
-        if (tab === 'profile') updateProfile();
-    }
-
-    function escapeHtml(text) { 
-        return String(text).replace(/[&<>]/g, function(m) { 
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]; 
-        });
-    }
-
-    // ============ Initialize ============
-    loadData();
-    if (localStorage.getItem('user')) {
-        isLoggedIn = true;
-        document.getElementById('authScreen').classList.remove('active');
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('homeScreen').classList.add('active');
-        updateProfile();
-    }
+    function updateQuote(){ document.getElementById('quoteOfDay').innerText=(quotes[currentLanguage]||quotes.en)[Math.floor(Math.random()*5)]; }
+    function updateProfile(){ document.getElementById('profileName').innerText=currentUser.name||'User'; document.getElementById('profileEmail').innerText=currentUser.email; document.getElementById('memberSince').innerHTML=currentUser.joined?new Date(currentUser.joined).toLocaleDateString():'2024'; document.getElementById('profileAvatar').innerHTML=(currentUser.name?.charAt(0)||'U').toUpperCase(); }
+    function toggleTheme(){ darkMode=!darkMode; localStorage.setItem('darkMode',darkMode); applyTheme(); }
+    function applyTheme(){ if(darkMode) document.body.classList.add('dark'); else document.body.classList.remove('dark'); document.getElementById('darkModeBtn').innerText=darkMode?'ON':'OFF'; document.getElementById('themeBtn').innerHTML=darkMode?'☀️':'🌙'; }
+    function setLanguage(lang){ currentLanguage=lang; localStorage.setItem('language',lang); applyLanguage(); updateQuote(); renderTasks(); }
+    function toggleNotifications(){ notificationsEnabled=!notificationsEnabled; localStorage.setItem('notifications',notificationsEnabled); document.getElementById('notifBtn').innerText=notificationsEnabled?'ON':'OFF'; showToast(notificationsEnabled?'Notifications enabled':'Notifications disabled'); if(notificationsEnabled&&'Notification' in window) Notification.requestPermission(); }
+    function showToast(msg){ let old=document.querySelector('.toast'); if(old) old.remove(); let t=document.createElement('div'); t.className='toast'; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2000); }
+    function exportData(){ let data={tasks,user:currentUser,exportDate:new Date().toISOString()}; let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`taskmaster_${Date.now()}.json`; a.click(); URL.revokeObjectURL(a.href); showToast('Data exported'); }
+    window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; });
+    function installApp(){ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; }); } else showToast('Install via browser menu (Add to Home Screen)'); }
+    function switchTab(tab){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(`${tab}Screen`).classList.add('active'); document.querySelectorAll('.nav-item').forEach(btn=>btn.classList.remove('active')); event.target.closest('.nav-item').classList.add('active'); if(tab==='tasks') renderTasks(); if(tab==='profile') updateProfile(); }
+    function escapeHtml(str){ return String(str).replace(/[&<>]/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[m];}); }
+    loadData(); if(localStorage.getItem('user')){ document.getElementById('authScreen').classList.remove('active'); document.getElementById('mainApp').style.display='block'; document.getElementById('homeScreen').classList.add('active'); updateProfile(); }
 </script>
 </body>
-</html>
+    </html>
