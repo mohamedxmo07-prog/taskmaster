@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TaskMaster">
+    <title>TaskMaster Pro - Ultimate Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #F59E0B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --bg-light: #F9FAFB;
+            --surface-light: #FFFFFF;
+            --text-light: #1F2937;
+            --text-muted-light: #6B7280;
+            --border-light: #E5E7EB;
+        }
+
+        body.dark {
+            --bg-light: #111827;
+            --surface-light: #1F2937;
+            --text-light: #F9FAFB;
+            --text-muted-light: #9CA3AF;
+            --border-light: #374151;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        body.rtl {
+            direction: rtl;
+        }
+
+        body.ltr {
+            direction: ltr;
+        }
+
+        .app {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--bg-light);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        .screen {
+            display: none;
+            padding: 20px;
+            padding-bottom: 80px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .date {
+            font-size: 14px;
+            color: var(--text-muted-light);
+            margin-top: 4px;
+        }
+
+        .theme-toggle, .icon-btn {
+            background: var(--surface-light);
+            border: 1px solid var(--border-light);
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--surface-light);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted-light);
+            margin-top: 4px;
+        }
+
+        .progress-section, .card {
+            background: var(--surface-light);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--border-light);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-muted-light);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .task-card {
+            background: var(--surface-light);
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox.completed {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkbox.completed::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .task-title.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-high { background: rgba(239,68,68,0.2); color: #EF4444; }
+        .priority-medium { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .priority-low { background: rgba(16,185,129,0.2); color: #10B981; }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            padding: 6px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--surface-light);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-light);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s;
+        }
+
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 11px; color: var(--text-muted-light); margin-top: 4px; }
+        .nav-item.active .nav-label { color: var(--primary); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--surface-light);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 28px 28px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-input, .modal-textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            font-size: 16px;
+            margin-bottom: 12px;
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .modal-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .priority-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .priority-option {
+            flex: 1;
+            padding: 10px;
+            border-radius: 14px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .priority-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .priority-option.selected span { color: white; }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-btn.cancel { background: var(--border-light); color: var(--text-muted-light); }
+        .modal-btn.save { background: var(--primary); color: white; }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background: var(--surface-light);
+            border-radius: 32px;
+            padding: 40px 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .logo {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 32px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .setting-item {
+            background: var(--surface-light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-label { font-size: 16px; font-weight: 500; color: var(--text-light); }
+
+        .lang-group { display: flex; gap: 8px; }
+        .lang-btn {
+            padding: 6px 16px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        .lang-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--danger), #DC2626);
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .empty-state { text-align: center; padding: 50px; color: var(--text-muted-light); }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 16px;
+            color: white;
+        }
+
+        .profile-name { text-align: center; font-size: 24px; font-weight: bold; color: var(--text-light); margin-bottom: 4px; }
+        .profile-email { text-align: center; color: var(--text-muted-light); margin-bottom: 24px; }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            max-width: 460px;
+            margin: 0 auto;
+            background: var(--surface-light);
+            color: var(--text-light);
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-align: center;
+            z-index: 300;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease;
+            border-left: 4px solid var(--success);
+        }
+    </style>
+</head>
+<body class="ltr">
+<div class="app" id="app">
+    <!-- Auth Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="logo">✅ TaskMaster Pro</div>
+                <div class="auth-title" id="authTitle">Welcome Back!</div>
+                <input type="text" id="loginName" class="auth-input" placeholder="Full Name" style="display: none;">
+                <input type="email" id="loginEmail" class="auth-input" placeholder="Email">
+                <input type="password" id="loginPassword" class="auth-input" placeholder="Password">
+                <button class="auth-btn" onclick="handleAuth()" id="authBtn">Login</button>
+                <div class="switch-auth" onclick="toggleAuthMode()" id="switchAuth">Don't have an account? Sign Up</div>
+                <div class="demo-hint" style="text-align:center; margin-top:20px; font-size:12px; color:var(--text-muted-light);">✨ Demo: any email + any password</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" style="display: none;">
+        <div id="homeScreen" class="screen active">
+            <div class="header">
+                <div>
+                    <div class="greeting" id="greeting">Good Morning</div>
+                    <div class="date" id="date"></div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-number" id="totalTasks">0</div><div class="stat-label" id="totalLabel">Total</div></div>
+                <div class="stat-card"><div class="stat-number" id="completedTasks">0</div><div class="stat-label" id="doneLabel">Done</div></div>
+                <div class="stat-card"><div class="stat-number" id="pendingTasks">0</div><div class="stat-label" id="pendingLabel">Pending</div></div>
+            </div>
+            <div class="progress-section">
+                <div class="section-title" id="progressTitle">📊 Today's Progress</div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+                <div class="progress-text" id="progressText">0% Complete</div>
+            </div>
+            <div class="card">
+                <div class="section-title" id="quoteTitle">💡 Quote of the Day</div>
+                <div id="quoteOfDay" style="color: var(--text-muted-light); font-style: italic;">"The secret of getting ahead is getting started."</div>
+            </div>
+        </div>
+
+        <div id="tasksScreen" class="screen">
+            <div class="section-title" id="myTasksTitle" style="margin-bottom: 16px;">📋 My Tasks</div>
+            <div id="tasksList"></div>
+        </div>
+
+        <div id="profileScreen" class="screen">
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <div class="profile-name" id="profileName">User</div>
+            <div class="profile-email" id="profileEmail">user@example.com</div>
+            <div class="card">
+                <div class="setting-item"><span class="setting-label" id="memberSinceLabel">📊 Member since</span><span id="memberSince">2024</span></div>
+                <div class="setting-item"><span class="setting-label" id="tasksCompletedLabel">✅ Tasks completed</span><span id="profileCompleted">0</span></div>
+                <div class="setting-item"><span class="setting-label" id="streakLabel">🏆 Current streak</span><span id="streak">0 days</span></div>
+            </div>
+            <div class="logout-btn" onclick="logout()" id="logoutBtn">🚪 Logout</div>
+        </div>
+
+        <div id="settingsScreen" class="screen">
+            <div class="section-title" id="settingsTitle" style="margin-bottom: 16px;">⚙️ Settings</div>
+            <div class="setting-item">
+                <span class="setting-label" id="darkModeLabel">🌙 Dark Mode</span>
+                <button class="theme-toggle" onclick="toggleTheme()" style="width: auto; padding: 8px 20px;" id="darkModeBtn">OFF</button>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label" id="languageLabel">🌐 Language</span>
+                <div class="lang-group">
+                    <button class="lang-btn" onclick="setLanguage('en')" id="langEn">English</button>
+                    <button class="lang-btn" onclick="setLanguage('ar')" id="langAr">العربية</button>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label" id="notifLabel">🔔 Notifications</span>
+                <button class="theme-toggle" onclick="toggleNotifications()" style="width: auto; padding: 8px 20px;" id="notifBtn">ON</button>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label" id="exportLabel">💾 Export Data</span>
+                <button class="theme-toggle" onclick="exportData()" style="width: auto; padding: 8px 20px;" id="exportBtn">Export</button>
+            </div>
+            <div class="setting-item"><span class="setting-label" id="versionLabel">ℹ️ Version</span><span>2.0.0</span></div>
+            <div class="setting-item">
+                <span class="setting-label" id="installLabel">📱 Install App</span>
+                <button class="theme-toggle" onclick="installApp()" style="width: auto; padding: 8px 20px;" id="installBtn">Install</button>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span class="nav-label" id="navHome">Home</span></button>
+            <button class="nav-item" onclick="switchTab('tasks')"><span class="nav-icon">📋</span><span class="nav-label" id="navTasks">Tasks</span></button>
+            <button class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span class="nav-label" id="navProfile">Profile</span></button>
+            <button class="nav-item" onclick="switchTab('settings')"><span class="nav-icon">⚙️</span><span class="nav-label" id="navSettings">Settings</span></button>
+        </div>
+
+        <button class="fab" onclick="openAddTaskModal()">+</button>
+    </div>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">New Task</div>
+            <input type="text" id="taskTitle" class="modal-input" placeholder="Task title">
+            <textarea id="taskDesc" class="modal-textarea" placeholder="Description (optional)"></textarea>
+            <div class="priority-group">
+                <div class="priority-option" onclick="selectPriority('low')" data-priority="low"><span id="lowText">🌿 Low</span></div>
+                <div class="priority-option" onclick="selectPriority('medium')" data-priority="medium"><span id="mediumText">⚡ Medium</span></div>
+                <div class="priority-option" onclick="selectPriority('high')" data-priority="high"><span id="highText">🔥 High</span></div>
+            </div>
+            <div class="modal-buttons">
+                <div class="modal-btn cancel" onclick="closeModal()" id="cancelBtn">Cancel</div>
+                <div class="modal-btn save" onclick="saveTask()" id="saveBtn">Save</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============ TRANSLATIONS DATABASE ============
+    const translations = {
+        en: {
+            // Auth
+            welcome: 'Welcome Back!',
+            signup: 'Create Account',
+            login: 'Login',
+            noAccount: "Don't have an account? Sign Up",
+            hasAccount: "Already have an account? Login",
+            // Navigation
+            home: 'Home',
+            tasks: 'Tasks',
+            profile: 'Profile',
+            settings: 'Settings',
+            // Stats
+            total: 'Total',
+            done: 'Done',
+            pending: 'Pending',
+            progress: "📊 Today's Progress",
+            complete: 'Complete',
+            myTasks: '📋 My Tasks',
+            // Task modal
+            newTask: 'New Task',
+            editTask: 'Edit Task',
+            taskTitle: 'Task title',
+            description: 'Description (optional)',
+            low: '🌿 Low',
+            medium: '⚡ Medium',
+            high: '🔥 High',
+            cancel: 'Cancel',
+            save: 'Save',
+            delete: 'Delete',
+            noTasks: 'No tasks yet. Tap + to add!',
+            // Settings
+            darkMode: '🌙 Dark Mode',
+            language: '🌐 Language',
+            notifications: '🔔 Notifications',
+            exportData: '💾 Export Data',
+            version: 'ℹ️ Version',
+            installApp: '📱 Install App',
+            // Profile
+            memberSince: '📊 Member since',
+            tasksCompleted: '✅ Tasks completed',
+            streak: '🏆 Current streak',
+            logout: '🚪 Logout',
+            days: 'days',
+            // Quotes
+            quoteTitle: '💡 Quote of the Day',
+            // Buttons
+            on: 'ON',
+            off: 'OFF',
+            export: 'Export',
+            install: 'Install'
+        },
+        ar: {
+            // Auth
+            welcome: 'مرحباً بعودتك!',
+            signup: 'إنشاء حساب',
+            login: 'تسجيل الدخول',
+            noAccount: 'ليس لديك حساب؟ إنشاء حساب',
+            hasAccount: 'لديك حساب؟ تسجيل الدخول',
+            // Navigation
+            home: 'الرئيسية',
+            tasks: 'المهام',
+            profile: 'الملف الشخصي',
+            settings: 'الإعدادات',
+            // Stats
+            total: 'الإجمالي',
+            done: 'مكتملة',
+            pending: 'معلقة',
+            progress: "📊 تقدم اليوم",
+            complete: 'مكتمل',
+            myTasks: '📋 مهامي',
+            // Task modal
+            newTask: 'مهمة جديدة',
+            editTask: 'تعديل مهمة',
+            taskTitle: 'عنوان المهمة',
+            description: 'الوصف (اختياري)',
+            low: '🌿 منخفضة',
+            medium: '⚡ متوسطة',
+            high: '🔥 عالية',
+            cancel: 'إلغاء',
+            save: 'حفظ',
+            delete: 'حذف',
+            noTasks: 'لا توجد مهام. اضغط + لإضافة مهمة!',
+            // Settings
+            darkMode: '🌙 الوضع الليلي',
+            language: '🌐 اللغة',
+            notifications: '🔔 الإشعارات',
+            exportData: '💾 تصدير البيانات',
+            version: 'ℹ️ الإصدار',
+            installApp: '📱 تثبيت التطبيق',
+            // Profile
+            memberSince: '📊 عضو منذ',
+            tasksCompleted: '✅ المهام المكتملة',
+            streak: '🏆 الإنجاز المتواصل',
+            logout: '🚪 تسجيل الخروج',
+            days: 'يوم',
+            // Quotes
+            quoteTitle: '💡 اقتباس اليوم',
+            // Buttons
+            on: 'تشغيل',
+            off: 'إيقاف',
+            export: 'تصدير',
+            install: 'تثبيت'
+        }
+    };
+
+    // Quotes
+    const quotes = {
+        en: [
+            "✨ The secret of getting ahead is getting started. - Mark Twain",
+            "🎯 Done is better than perfect. - Facebook",
+            "📈 Small progress is still progress.",
+            "⭐ You don't have to be great to start, but you have to start to be great.",
+            "⚡ Productivity is never an accident."
+        ],
+        ar: [
+            "✨ سر التقدم هو البدء. - مارك توين",
+            "🎯 المنجز أفضل من المثالي.",
+            "📈 التقدم الصغير لا يزال تقدماً.",
+            "⭐ لست بحاجة لأن تكون عظيماً لتبدأ، لكن عليك أن تبدأ لتكون عظيماً.",
+            "⚡ الإنتاجية ليست حادثة أبداً."
+        ]
+    };
+
+    // ============ App State ============
+    let isLoggedIn = false;
+    let darkMode = false;
+    let currentLanguage = 'en';
+    let notificationsEnabled = true;
+    let tasks = [];
+    let editingTaskId = null;
+    let selectedPriority = 'medium';
+    let currentUser = { email: '', name: 'User', joined: new Date().toISOString() };
+    let deferredPrompt;
+
+    // ============ Translation Function ============
+    function t(key) {
+        return translations[currentLanguage][key] || translations.en[key] || key;
+    }
+
+    // ============ Apply Language to All UI Elements ============
+    function applyLanguage() {
+        // Auth screen
+        const isLoginMode = document.getElementById('authTitle').innerText === 'Welcome Back!' || document.getElementById('authTitle').innerText === 'مرحباً بعودتك!';
+        document.getElementById('authTitle').innerText = isLoginMode ? t('welcome') : t('signup');
+        document.getElementById('authBtn').innerText = (document.getElementById('authBtn').innerText === 'Login' || document.getElementById('authBtn').innerText === 'تسجيل الدخول') ? t('login') : t('signup');
+        document.getElementById('switchAuth').innerHTML = (document.getElementById('switchAuth').innerHTML.includes('Sign Up') || document.getElementById('switchAuth').innerHTML.includes('إنشاء حساب')) ? t('noAccount') : t('hasAccount');
+        document.getElementById('loginName').placeholder = 'Full Name';
+        document.getElementById('loginEmail').placeholder = 'Email';
+        document.getElementById('loginPassword').placeholder = 'Password';
+        
+        // Navigation
+        document.getElementById('navHome').innerText = t('home');
+        document.getElementById('navTasks').innerText = t('tasks');
+        document.getElementById('navProfile').innerText = t('profile');
+        document.getElementById('navSettings').innerText = t('settings');
+        
+        // Home screen
+        document.getElementById('totalLabel').innerText = t('total');
+        document.getElementById('doneLabel').innerText = t('done');
+        document.getElementById('pendingLabel').innerText = t('pending');
+        document.getElementById('progressTitle').innerHTML = t('progress');
+        document.getElementById('quoteTitle').innerHTML = t('quoteTitle');
+        
+        // Tasks screen
+        document.getElementById('myTasksTitle').innerHTML = t('myTasks');
+        
+        // Profile screen
+        document.getElementById('memberSinceLabel').innerHTML = t('memberSince');
+        document.getElementById('tasksCompletedLabel').innerHTML = t('tasksCompleted');
+        document.getElementById('streakLabel').innerHTML = t('streak');
+        document.getElementById('logoutBtn').innerHTML = t('logout');
+        
+        // Settings screen
+        document.getElementById('settingsTitle').innerHTML = '⚙️ ' + t('settings');
+        document.getElementById('darkModeLabel').innerHTML = t('darkMode');
+        document.getElementById('languageLabel').innerHTML = t('language');
+        document.getElementById('notifLabel').innerHTML = t('notifications');
+        document.getElementById('exportLabel').innerHTML = t('exportData');
+        document.getElementById('versionLabel').innerHTML = t('version');
+        document.getElementById('installLabel').innerHTML = t('installApp');
+        document.getElementById('exportBtn').innerText = t('export');
+        document.getElementById('installBtn').innerText = t('install');
+        document.getElementById('darkModeBtn').innerText = darkMode ? t('on') : t('off');
+        document.getElementById('notifBtn').innerText = notificationsEnabled ? t('on') : t('off');
+        
+        // Modal
+        document.getElementById('modalTitle').innerText = editingTaskId ? t('editTask') : t('newTask');
+        document.getElementById('taskTitle').placeholder = t('taskTitle');
+        document.getElementById('taskDesc').placeholder = t('description');
+        document.getElementById('lowText').innerHTML = t('low');
+        document.getElementById('mediumText').innerHTML = t('medium');
+        document.getElementById('highText').innerHTML = t('high');
+        document.getElementById('cancelBtn').innerText = t('cancel');
+        document.getElementById('saveBtn').innerText = t('save');
+        
+        // Language buttons highlight
+        document.getElementById('langEn').classList.toggle('active', currentLanguage === 'en');
+        document.getElementById('langAr').classList.toggle('active', currentLanguage === 'ar');
+        
+        // Direction
+        if (currentLanguage === 'ar') {
+            document.body.classList.remove('ltr');
+            document.body.classList.add('rtl');
+        } else {
+            document.body.classList.remove('rtl');
+            document.body.classList.add('ltr');
+        }
+        
+        // Update stats numbers labels
+        updateStats();
+        updateQuote();
+    }
+
+    // ============ Load/Save ============
+    function loadData() {
+        const savedTasks = localStorage.getItem('tasks');
+        if (savedTasks) tasks = JSON.parse(savedTasks);
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) currentUser = JSON.parse(savedUser);
+        const savedTheme = localStorage.getItem('darkMode');
+        if (savedTheme === 'true') darkMode = true;
+        const savedLang = localStorage.getItem('language');
+        if (savedLang) currentLanguage = savedLang;
+        const savedNotif = localStorage.getItem('notifications');
+        if (savedNotif !== null) notificationsEnabled = savedNotif === 'true';
+        applyTheme();
+        applyLanguage();
+        renderTasks();
+    }
+
+    function saveTasks() { localStorage.setItem('tasks', JSON.stringify(tasks)); }
+    function saveUser() { localStorage.setItem('user', JSON.stringify(currentUser)); }
+
+    // ============ Auth ============
+    function handleAuth() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const name = document.getElementById('loginName').value;
+        const isSignup = document.getElementById('authTitle').innerText === t('signup');
+        
+        if (!email || !password) { showToast('Please fill all fields'); return; }
+        if (isSignup && !name) { showToast('Please enter your name'); return; }
+        
+        if (isSignup) {
+            currentUser = { email: email, name: name, joined: new Date().toISOString() };
+        } else {
+            currentUser = { ...currentUser, email: email };
+        }
+        saveUser();
+        isLoggedIn = true;
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('homeScreen').classList.add('active');
+        updateProfile();
+        loadData();
+        showToast(isSignup ? 'Account created successfully!' : 'Welcome back!');
+        if (notificationsEnabled && 'Notification' in window) Notification.requestPermission();
+    }
+
+    function toggleAuthMode() {
+        const isLogin = document.getElementById('authTitle').innerText === t('welcome');
+        if (isLogin) {
+            document.getElementById('authTitle').innerText = t('signup');
+            document.getElementById('authBtn').innerText = t('signup');
+            document.getElementById('switchAuth').innerHTML = t('hasAccount');
+            document.getElementById('loginName').style.display = 'block';
+        } else {
+            document.getElementById('authTitle').innerText = t('welcome');
+            document.getElementById('authBtn').innerText = t('login');
+            document.getElementById('switchAuth').innerHTML = t('noAccount');
+            document.getElementById('loginName').style.display = 'none';
+        }
+    }
+
+    function logout() {
+        isLoggedIn = false;
+        localStorage.removeItem('user');
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('authScreen').classList.add('active');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginName').value = '';
+        showToast('Logged out successfully');
+    }
+
+    // ============ Tasks ============
+    function renderTasks() {
+        const container = document.getElementById('tasksList');
+        if (tasks.length === 0) {
+            container.innerHTML = `<div class="empty-state">📋 ${t('noTasks')}</div>`;
+            return;
+        }
+        container.innerHTML = tasks.map(task => `
+            <div class="task-card">
+                <div class="checkbox ${task.completed ? 'completed' : ''}" onclick="toggleTask('${task.id}')"></div>
+                <div class="task-content">
+                    <div class="task-title ${task.completed ? 'completed' : ''}">${escapeHtml(task.title)}</div>
+                    ${task.description ? `<div style="font-size: 12px; color: var(--text-muted-light);">${escapeHtml(task.description)}</div>` : ''}
+                    <span class="priority-badge priority-${task.priority}">${task.priority === 'high' ? t('high') : task.priority === 'medium' ? t('medium') : t('low')}</span>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn" onclick="editTask('${task.id}')">✏️</button>
+                    <button class="task-btn" onclick="deleteTask('${task.id}')">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+        updateStats();
+    }
+
+    function toggleTask(id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            saveTasks();
+            renderTasks();
+            updateStats();
+            if (task.completed && notificationsEnabled) showToast(`✅ Task completed: ${task.title}`);
+        }
+    }
+
+    function deleteTask(id) {
+        if (confirm(t('delete') + '?')) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+            updateStats();
+            showToast('Task deleted');
+        }
+    }
+
+    function editTask(id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            editingTaskId = id;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDesc').value = task.description || '';
+            selectedPriority = task.priority;
+            document.getElementById('modalTitle').innerText = t('editTask');
+            document.getElementById('taskModal').classList.add('active');
+            updatePriorityUI();
+        }
+    }
+
+    function openAddTaskModal() {
+        editingTaskId = null;
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDesc').value = '';
+        selectedPriority = 'medium';
+        document.getElementById('modalTitle').innerText = t('newTask');
+        document.getElementById('taskModal').classList.add('active');
+        updatePriorityUI();
+    }
+
+    function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
+
+    function selectPriority(priority) { selectedPriority = priority; updatePriorityUI(); }
+
+    function updatePriorityUI() {
+        document.querySelectorAll('.priority-option').forEach(opt => {
+            if (opt.dataset.priority === selectedPriority) opt.classList.add('selected');
+            else opt.classList.remove('selected');
+        });
+    }
+
+    function saveTask() {
+        const title = document.getElementById('taskTitle').value.trim();
+        if (!title) { showToast('Please enter a task title'); return; }
+        const description = document.getElementById('taskDesc').value.trim();
+        if (editingTaskId) {
+            const index = tasks.findIndex(t => t.id === editingTaskId);
+            if (index !== -1) {
+                tasks[index] = { ...tasks[index], title, description, priority: selectedPriority };
+                showToast('Task updated');
+            }
+        } else {
+            tasks.unshift({ id: Date.now().toString(), title, description, priority: selectedPriority, completed: false, createdAt: new Date().toISOString() });
+            showToast('Task added');
+        }
+        saveTasks();
+        renderTasks();
+        closeModal();
+    }
+
+    // ============ Stats ============
+    function updateStats() {
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.completed).length;
+        const pending = total - completed;
+        const percent = total > 0 ? (completed / total) * 100 : 0;
+        document.getElementById('totalTasks').innerText = total;
+        document.getElementById('completedTasks').innerText = completed;
+        document.getElementById('pendingTasks').innerText = pending;
+        document.getElementById('progressFill').style.width = percent + '%';
+        document.getElementById('progressText').innerHTML = Math.round(percent) + '% ' + t('complete');
+        document.getElementById('profileCompleted').innerText = completed;
+        
+        const streak = calculateStreak();
+        document.getElementById('streak').innerHTML = streak + ' ' + t('days');
+        
+        const hour = new Date().getHours();
+        document.getElementById('greeting').innerHTML = hour < 12 ? '🌅 ' + (currentLanguage === 'en' ? 'Good Morning' : 'صباح الخير') : hour < 18 ? '☀️ ' + (currentLanguage === 'en' ? 'Good Afternoon' : 'مساء الخير') : '🌙 ' + (currentLanguage === 'en' ? 'Good Evening' : 'مساء الخير');
+        document.getElementById('date').innerHTML = new Date().toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'ar-EG', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function calculateStreak() {
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const completedToday = tasks.filter(t => t.completed && new Date(t.createdAt).toDateString() === today).length;
+        const completedYesterday = tasks.filter(t => t.completed && new Date(t.createdAt).toDateString() === yesterday).length;
+        if (completedToday > 0) return completedYesterday > 0 ? 2 : 1;
+        return 0;
+    }
+
+    function updateQuote() {
+        const quotesList = quotes[currentLanguage] || quotes.en;
+        const randomQuote = quotesList[Math.floor(Math.random() * quotesList.length)];
+        document.getElementById('quoteOfDay').innerText = randomQuote;
+    }
+
+    // ============ Profile ============
+    function updateProfile() {
+        document.getElementById('profileName').innerText = currentUser.name || 'User';
+        document.getElementById('profileEmail').innerText = currentUser.email;
+        document.getElementById('memberSince').innerHTML = currentUser.joined ? new Date(currentUser.joined).toLocaleDateString() : '2024';
+        const avatarLetter = (currentUser.name?.charAt(0) || 'U').toUpperCase();
+        document.getElementById('profileAvatar').innerHTML = avatarLetter;
+    }
+
+    // ============ Theme ============
+    function toggleTheme() {
+        darkMode = !darkMode;
+        localStorage.setItem('darkMode', darkMode);
+        applyTheme();
+    }
+
+    function applyTheme() {
+        if (darkMode) document.body.classList.add('dark');
+        else document.body.classList.remove('dark');
+        const btn = document.getElementById('darkModeBtn');
+        if (btn) btn.innerText = darkMode ? t('on') : t('off');
+        document.getElementById('themeBtn').innerHTML = darkMode ? '☀️' : '🌙';
+    }
+
+    // ============ Language ============
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('language', lang);
+        applyLanguage();
+        updateQuote();
+        renderTasks();
+    }
+
+    // ============ Notifications ============
+    function toggleNotifications() {
+        notificationsEnabled = !notificationsEnabled;
+        localStorage.setItem('notifications', notificationsEnabled);
+        document.getElementById('notifBtn').innerText = notificationsEnabled ? t('on') : t('off');
+        showToast(notificationsEnabled ? 'Notifications enabled' : 'Notifications disabled');
+        if (notificationsEnabled && 'Notification' in window) Notification.requestPermission();
+    }
+
+    function showToast(message) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    // ============ Export Data ============
+    function exportData() {
+        const data = { tasks, user: currentUser, exportDate: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `taskmaster_backup_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Data exported successfully');
+    }
+
+    // ============ Install App ============
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        } else {
+            showToast('Install manually via browser menu (Add to Home Screen)');
+        }
+    }
+
+    // ============ Navigation ============
+    function switchTab(tab) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(`${tab}Screen`).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        event.target.closest('.nav-item').classList.add('active');
+        if (tab === 'tasks') renderTasks();
+        if (tab === 'profile') updateProfile();
+    }
+
+    function escapeHtml(text) { 
+        return String(text).replace(/[&<>]/g, function(m) { 
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]; 
+        });
+    }
+
+    // ============ Initialize ============
+    loadData();
+    if (localStorage.getItem('user')) {
+        isLoggedIn = true;
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('homeScreen').classList.add('active');
+        updateProfile();
+    }
+</script>
+</body>
+</html>
